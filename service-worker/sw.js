@@ -1,21 +1,21 @@
 //SW
 
 self.addEventListener("install", e => {
-  console.log("SW: Install Event");
+  console.log("SW Install");
 });
 
 self.addEventListener("activate", e => {
-  console.log("SW: Activate Event");
+  console.log("SW Activate");
 });
 
 self.addEventListener("fetch", e => {
-  console.log("Fetch Event: " + e.request.url);
+  console.log("SW Fetch: " + e.request.url);
 });
 
 self.addEventListener("message", e => {
-  console.log(e.data);
+  console.log(`SW Message: ${e.data}`);
 });
 
 self.addEventListener("push", e => {
-  console.log("Push received");
+  console.log(`SW Push: ${e.data.text()}`);
 });
