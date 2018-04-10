@@ -6,6 +6,7 @@ if (navigator.serviceWorker) {
     .register("./sw.js")
     .then(function(registration) {
       console.log("SW Registered");
+      registration.active.postMessage("Hello from Main.js");
     })
     .catch(console.log());
 }

@@ -11,3 +11,11 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   console.log("Fetch Event: " + e.request.url);
 });
+
+self.addEventListener("message", e => {
+  console.log(e.data);
+});
+
+self.addEventListener("push", e => {
+  console.log("Push received");
+});
