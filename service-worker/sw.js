@@ -18,4 +18,6 @@ self.addEventListener("message", e => {
 
 self.addEventListener("push", e => {
   console.log(`SW Push: ${e.data.text()}`);
+  let notification = self.registration.showNotification("PWA SW Notification");
+  e.waitUntil(notification);
 });
