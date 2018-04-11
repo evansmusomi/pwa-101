@@ -4,14 +4,14 @@ const vapid = require("./vapid.json");
 
 // configure keys
 webpush.setVapidDetails(
-  "mailto: evans.musomi@gmail.com",
+  "mailto:apps@evansmusomi.com",
   vapid.publicKey,
   vapid.privateKey
 );
 
 const pushSubscription = {
   endpoint:
-    "https://fcm.googleapis.com/fcm/send/dLumt7s5klw:AP…ECyRlFuctGTQmviZswRf1mRtqEd06ef4eRAoKUZiX-v8t1XEG",
+    "https://fcm.googleapis.com/fcm/send/dLumt7s5klw:APA91bFnPG-KgM53diZ2gnd4PVYrL7P-1H15wzNKjpTe2mZnZFzKhcnUEFWFnaYeUJdI_vUaJu3miDsIzkIHEBU2r_XECyRlFuctGTQmviZswRf1mRtqEd06ef4eRAoKUZiX-v8t1XEG",
   keys: {
     auth: "OAmFSAAz-OdZ_vRTr058-w==",
     p256dh:
