@@ -1,5 +1,6 @@
 // Progressive Enhancement (SW support)
 
+// Service Workers
 if (navigator.serviceWorker) {
   // convert key to Uint8Array
   function urlBase64ToUint8Array(base64String) {
@@ -48,7 +49,7 @@ if (navigator.serviceWorker) {
     .catch(console.log());
 }
 
-// notification support
+// Notification support
 if (window.Notification) {
   function showNotification() {
     const notificationOptions = {
