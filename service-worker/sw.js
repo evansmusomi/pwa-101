@@ -29,20 +29,17 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   console.log("SW Fetch: " + event.request.url);
 
-  // 2. Cache with network fallback
+  // 3. Network with cache fallback
   event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) return response;
+    fetch(event.request)
+      .then(response => {
+        // cache latest version
+        caches.open(pwaCache).then(cache => cache.put(event.request, response));
+        return response.clone();
 
-      // fallback
-      return fetch(event.request).then(newResponse => {
-        // cache fetched response
-        caches
-          .open(pwaCache)
-          .then(cache => cache.put(event.request, newResponse));
-        return newResponse.clone();
-      });
-    })
+        // fallback to cache
+      })
+      .catch(error => caches.match(event.request))
   );
 });
 
