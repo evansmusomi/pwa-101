@@ -1,7 +1,7 @@
 // Service Worker
 
 const pwaCache = "pwa-cache-v2";
-const staticCache = ["./", "./style.css", "./icon.png", "./main.js"];
+const staticCache = ["./", "./style.css", "./thumb.png", "./main.js"];
 
 self.addEventListener("install", event => {
   console.log("SW Install");
@@ -29,8 +29,21 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   console.log("SW Fetch: " + event.request.url);
 
-  // 1. Cache only. Static assets - App - Shell
-  event.respondWith(caches.match(event.request));
+  // 2. Cache with network fallback
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) return response;
+
+      // fallback
+      return fetch(event.request).then(newResponse => {
+        // cache fetched response
+        caches
+          .open(pwaCache)
+          .then(cache => cache.put(event.request, newResponse));
+        return newResponse.clone();
+      });
+    })
+  );
 });
 
 self.addEventListener("message", event => {
