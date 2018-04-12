@@ -1,6 +1,6 @@
 // Service Worker
 
-const pwaCache = "pwa-cache-v1";
+const pwaCache = "pwa-cache-v2";
 
 self.addEventListener("install", event => {
   console.log("SW Install");
@@ -9,11 +9,20 @@ self.addEventListener("install", event => {
     return cache.addAll(["./", "./style.css", "./icon.png", "./main.js"]);
   });
 
-  e.waitUntil(cacheReady);
+  event.waitUntil(cacheReady);
 });
 
 self.addEventListener("activate", event => {
   console.log("SW Activate");
+
+  // delete redundant caches
+  let cacheCleaned = caches.keys().then(keys => {
+    keys.forEach(key => {
+      if (key !== pwaCache) return caches.delete(key);
+    });
+  });
+
+  event.waitUntil(cacheCleaned);
 });
 
 self.addEventListener("fetch", event => {
@@ -37,6 +46,8 @@ self.addEventListener("fetch", event => {
       });
     });
   });
+
+  event.respondWith(newResponse);
 });
 
 self.addEventListener("message", event => {
