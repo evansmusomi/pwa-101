@@ -1,7 +1,15 @@
 // Service Worker
 
-const pwaCache = "pwa-cache-v2";
-const staticCache = ["./", "./style.css", "./thumb.png", "placeholder.png", "./main.js"];
+const pwaCache = "pwa-cache-v3";
+const staticCache = [
+  "./",
+  "./index.html",
+  "./page2.html",
+  "./style.css",
+  "./thumb.png",
+  "./placeholder.png",
+  "./main.js"
+];
 
 self.addEventListener("install", event => {
   console.log("SW Install");
@@ -23,43 +31,30 @@ self.addEventListener("activate", event => {
     });
   });
 
+  self.registration.showNotification("PWA SW Notification", {
+    body: "PWAs rock and are the way to go 😎",
+    icon: "./icon.png"
+  });
+
   event.waitUntil(cacheCleaned);
 });
 
 self.addEventListener("fetch", event => {
   console.log("SW Fetch: " + event.request.url);
 
-  // 5. Cache and Network Race with offline content
-  let firstResponse = new Promise((resolve, reject) => {
-    
-    // track rejections
-    let firstRejectionReceived = false;
-    let rejectOnce = () => {
-      if (firstRejectionReceived){
-        if(event.request.url.match('thumb.png')){
-          resolve(caches.match('./placeholder.png'));
-        }else{
-          reject('No response received');  
-        }
-      }else{
-        firstRejectionReceived = true;
-      }
-    }
-    
-    // try network
-    fetch(event.request).then(response => {
-      response.ok ? resolve(response) : rejectOnce();
-    }).catch(rejectOnce);
-    
-    // try cache
-    caches.match(event.request).then(response => {
-      response ? resolve(response) : rejectOnce();
-    }).catch(rejectOnce);
-    
+  // Cache with network fallback
+  let response = caches.match(event.request).then(result => {
+    if (result) return result;
+    return fetch(event.request).then(fetchResponse => {
+      caches
+        .open(pwaCache)
+        .then(cache => cache.put(event.request, fetchResponse));
+      return fetchResponse.clone();
+    });
   });
-  
-  event.respondWith(firstResponse);
 
+  // respond
+  event.respondWith(response);
 });
 
 self.addEventListener("message", event => {
