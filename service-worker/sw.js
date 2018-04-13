@@ -1,7 +1,7 @@
 // Service Worker
 
 const pwaCache = "pwa-cache-v2";
-const staticCache = ["./", "./style.css", "./thumb.png", "./main.js"];
+const staticCache = ["./", "./style.css", "./thumb.png", "placeholder.png", "./main.js"];
 
 self.addEventListener("install", event => {
   console.log("SW Install");
@@ -29,14 +29,18 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   console.log("SW Fetch: " + event.request.url);
 
-  // 5. Cache and Network Race
+  // 5. Cache and Network Race with offline content
   let firstResponse = new Promise((resolve, reject) => {
     
     // track rejections
     let firstRejectionReceived = false;
     let rejectOnce = () => {
       if (firstRejectionReceived){
-        reject('No response received');
+        if(event.request.url.match('thumb.png')){
+          resolve(caches.match('./placeholder.png'));
+        }else{
+          reject('No response received');  
+        }
       }else{
         firstRejectionReceived = true;
       }
@@ -50,10 +54,12 @@ self.addEventListener("fetch", event => {
     // try cache
     caches.match(event.request).then(response => {
       response ? resolve(response) : rejectOnce();
-    }).catch(rejectOnce());
+    }).catch(rejectOnce);
     
   });
+  
   event.respondWith(firstResponse);
+
 });
 
 self.addEventListener("message", event => {
