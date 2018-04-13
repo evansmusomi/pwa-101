@@ -29,26 +29,31 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   console.log("SW Fetch: " + event.request.url);
 
-  // 4. Cache with Network Update
-  event.respondWith(
-    caches.open(pwaCache).then(cache => {
-      // return from cache
-      return cache
-        .match(event.request)
-        .then(response => {
-          //update cache from network
-          let updatedResponse = fetch(event.request)
-            .then(newResponse => {
-              cache.put(event.request, newResponse.clone());
-              return newResponse;
-            })
-            .catch(console.log);
-
-          return response || updatedResponse;
-        })
-        .catch(console.log);
-    })
-  );
+  // 5. Cache and Network Race
+  let firstResponse = new Promise((resolve, reject) => {
+    
+    // track rejections
+    let firstRejectionReceived = false;
+    let rejectOnce = () => {
+      if (firstRejectionReceived){
+        reject('No response received');
+      }else{
+        firstRejectionReceived = true;
+      }
+    }
+    
+    // try network
+    fetch(event.request).then(response => {
+      response.ok ? resolve(response) : rejectOnce();
+    }).catch(rejectOnce);
+    
+    // try cache
+    caches.match(event.request).then(response => {
+      response ? resolve(response) : rejectOnce();
+    }).catch(rejectOnce());
+    
+  });
+  event.respondWith(firstResponse);
 });
 
 self.addEventListener("message", event => {
