@@ -1,14 +1,14 @@
 // Service Worker
 
-const pwaCache = "pwa-cache-v3";
+const pwaCache = "pwa-cache-v4";
 const staticCache = [
-  "./",
-  "./index.html",
-  "./page2.html",
-  "./style.css",
-  "./thumb.png",
-  "./placeholder.png",
-  "./main.js"
+  "/",
+  "/index.html",
+  "/page2.html",
+  "/style.css",
+  "/img/thumb.png",
+  "/img/placeholder.png",
+  "/main.js"
 ];
 
 self.addEventListener("install", event => {
@@ -33,7 +33,7 @@ self.addEventListener("activate", event => {
 
   self.registration.showNotification("PWA SW Notification", {
     body: "PWAs rock and are the way to go 😎",
-    icon: "./icon.png"
+    icon: "/icons/icon.png"
   });
 
   event.waitUntil(cacheCleaned);
